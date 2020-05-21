@@ -6,7 +6,13 @@ import {
   removeItem,
 } from './../ducks/items.reducer.js';
 
-import { userLoading, userLoaded, authError } from './../ducks/auth.reducer';
+import {
+  userLoading,
+  userLoaded,
+  authError,
+  registerSuccess,
+  registerFail,
+} from './../ducks/auth.reducer';
 
 import { getErrors } from './../ducks/error.reducer';
 
@@ -88,6 +94,43 @@ export const loadUserFetch = () => {
 
         // limpa os dados de autenticacao
         dispatch(authError());
+      });
+  };
+};
+
+///
+export const registerUserFetch = (user) => {
+  // console.log('fetchActions: registerUserFetch: user', user);
+  return (dispatch) => {
+    //Headers
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    // Request
+    api
+      .post('api/users', user, config)
+      .then((res) => {
+        // console.log('fetchActions: registerUserFetch:res.data', res.data);
+        const authUser = {
+          token: res.data.token,
+          user: res.data.user,
+        };
+        dispatch(registerSuccess(authUser));
+      })
+      .catch((err) => {
+        // dispara o erro
+        dispatch(
+          getErrors({
+            msg: err.response.data,
+            status: err.response.status,
+            id: 'REGISTER_FAIL',
+          }),
+        );
+
+        // limpa os dados de autenticacao
+        dispatch(registerFail());
       });
   };
 };

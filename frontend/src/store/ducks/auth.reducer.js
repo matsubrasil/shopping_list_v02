@@ -15,7 +15,7 @@ export const authError = createAction('AUTH_ERROR');
 export const loginSuccess = createAction('LOGIN_SUCCESS');
 export const loginFail = createAction('LOGIN_FAIL');
 
-export const logoutSuccess = createAction('LOGOUT_SUCCESS');
+export const logout = createAction('LOGOUT');
 
 export const registerSuccess = createAction('REGISTER_SUCCESS');
 export const registerFail = createAction('REGISTER_FAIL');
@@ -37,20 +37,26 @@ export default createReducer(INITIAL_STATE, {
   }),
 
   //
-  [loginSuccess.type]: (state, action) => ({
-    ...state,
-    ...action.payload,
-    isAuthenticated: true,
-    isLoading: false,
-  }),
+  [loginSuccess.type]: (state, action) => {
+    localStorage.setItem('token', action.payload.token);
+    return {
+      ...state,
+      ...action.payload,
+      isAuthenticated: true,
+      isLoading: false,
+    };
+  },
 
   //
-  [registerSuccess.type]: (state, action) => ({
-    ...state,
-    ...action.payload,
-    isAuthenticated: true,
-    isLoading: false,
-  }),
+  [registerSuccess.type]: (state, action) => {
+    localStorage.setItem('token', action.payload.token);
+    return {
+      ...state,
+      ...action.payload,
+      isAuthenticated: true,
+      isLoading: false,
+    };
+  },
 
   //
   [authError.type]: (state, action) => {
@@ -77,7 +83,7 @@ export default createReducer(INITIAL_STATE, {
   },
 
   //
-  [logoutSuccess.type]: (state, action) => {
+  [logout.type]: (state, action) => {
     localStorage.removeItem('token');
     return {
       ...state,
