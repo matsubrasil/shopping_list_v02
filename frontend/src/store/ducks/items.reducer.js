@@ -1,24 +1,48 @@
 import { createAction, createReducer } from '@reduxjs/toolkit';
 
-import { v4 as uuidv4 } from 'uuid'; // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
+// import { v4 as uuidv4 } from 'uuid'; // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
 
-const INITIAL_STATE = [
-  { id: uuidv4(), name: 'Eggs' },
-  { id: uuidv4(), name: 'Milk' },
-  { id: uuidv4(), name: 'Steak' },
-  { id: uuidv4(), name: 'Water' },
-];
+const INITIAL_STATE = {
+  list: [],
+  loading: false,
+};
 
 export const addItem = createAction('ADD_ITEM');
+export const getItems = createAction('GET_ITEMS');
 export const removeItem = createAction('REMOVE_ITEM');
+export const loadingItems = createAction('LOADING_ITEMS');
 
-const itemsReducer = createReducer(INITIAL_STATE, {
-  [addItem.type]: (state, action) => [...state, action.payload],
-  [removeItem.type]: (state, action) =>
-    state.filter((item) => item.id !== action.payload),
+export default createReducer(INITIAL_STATE, {
+  // lista de actions
+
+  //
+  [getItems.type]: (state, action) => ({
+    ...state,
+    list: [...action.payload],
+    loading: false,
+  }),
+
+  //
+  [addItem.type]: (state, action) => ({
+    ...state,
+    list: [action.payload, ...state.list],
+  }),
+
+  //
+  [removeItem.type]: (state, action) => ({
+    ...state,
+    list: state.list.filter((item) => item._id !== action.payload),
+  }),
+
+  //
+  [loadingItems.type]: (state) => ({
+    ...state,
+    loading: true,
+  }),
+
+  //
 });
 
-export default itemsReducer;
 /*
 
 const itemsReducer = (state = INITIAL_STATE, action) => {
