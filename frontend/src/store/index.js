@@ -2,10 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 
 // lista de reducer
 import itemsReducer from './ducks/items.reducer';
+import errorReducer from './ducks/error.reducer';
+import authReducer from './ducks/auth.reducer';
 
 export default configureStore({
   reducer: {
     items: itemsReducer,
+    error: errorReducer,
+    auth: authReducer,
   },
 });
 
