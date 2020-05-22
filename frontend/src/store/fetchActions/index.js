@@ -12,10 +12,13 @@ import {
   authError,
   registerSuccess,
   registerFail,
+  loginSuccess,
+  loginFail,
 } from './../ducks/auth.reducer';
 
 import { getErrors } from './../ducks/error.reducer';
 
+// GET ALL ITEMS
 export const getAllItemsFetch = () => {
   return (dispatch) => {
     // avisa que esta pesquisando
@@ -28,49 +31,58 @@ export const getAllItemsFetch = () => {
         // console.log(res.data.data);
         dispatch(getItems(res.data.data));
       })
-      .catch((err) => console.log(err.response.error));
+      .catch((err) =>
+        dispatch(
+          getErrors({
+            msg: err.response.data,
+            status: err.response.status,
+            id: null,
+          }),
+        ),
+      );
   };
 };
 
+// SAVE ITEM
 export const saveItemFetch = (item) => {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     api
-      .post('api/items', item)
+      .post('api/items', item, tokenConfig(getState))
       .then((res) => dispatch(addItem(res.data.data)))
-      .catch((err) => console.log(err.response.message));
+      .catch((err) => {
+        // dispara o erro
+        dispatch(
+          getErrors({
+            msg: err.response.data,
+            status: err.response.status,
+            id: null,
+          }),
+        );
+      });
   };
 };
 
+// DELETE ITEM
 export const removeItemFetch = (id) => {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     // console.log('fetcActions:removeItemFethc:id', id);
     api //
-      .delete(`api/items/${id}`) //
+      .delete(`api/items/${id}`, tokenConfig(getState)) //
       .then((res) => dispatch(removeItem(id)))
-      .catch((err) => console.log(err.response.message));
+      .catch((err) => {
+        // dispara o erro
+        dispatch(
+          getErrors({
+            msg: err.response.data,
+            status: err.response.status,
+            id: null,
+          }),
+        );
+      });
   };
 };
 
-// // RETURN ERRORS
-// export const returnErrorsFetch = (msg, status, id = null) => {
-//   return (dispatch) =>
-//     dispatch(
-//       getErrors({
-//         msg,
-//         status,
-//         id,
-//       }),
-//     );
-// };
-
-// // CLEAR ERRORS
-// export const clearErrorsFetch = () => {
-//   return (dispatch) => {
-//     dispatch(clearErrors());
-//   };
-// };
-
-//
+// LOAD DATA USER
 export const loadUserFetch = () => {
   return (dispatch, getState) => {
     // user loading
@@ -98,7 +110,7 @@ export const loadUserFetch = () => {
   };
 };
 
-///
+// REGISTER USER
 export const registerUserFetch = (user) => {
   // console.log('fetchActions: registerUserFetch: user', user);
   return (dispatch) => {
@@ -135,6 +147,43 @@ export const registerUserFetch = (user) => {
   };
 };
 
+// LOGIN USER
+export const loginUserFetch = (user) => {
+  // console.log('fetchActions: registerUserFetch: user', user);
+  return (dispatch) => {
+    //Headers
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    // Request
+    api
+      .post('api/auth', user, config)
+      .then((res) => {
+        // console.log('fetchActions: registerUserFetch:res.data', res.data);
+        const authUser = {
+          token: res.data.token,
+          user: res.data.user,
+        };
+        dispatch(loginSuccess(authUser));
+      })
+      .catch((err) => {
+        // dispara o erro
+        dispatch(
+          getErrors({
+            msg: err.response.data,
+            status: err.response.status,
+            id: 'LOGIN_FAIL',
+          }),
+        );
+
+        // limpa os dados de autenticacao
+        dispatch(loginFail());
+      });
+  };
+};
+
 // Setup config/headers and token
 export const tokenConfig = (getState) => {
   // get token from localstorage
@@ -154,3 +203,22 @@ export const tokenConfig = (getState) => {
 
   return config;
 };
+
+// // RETURN ERRORS
+// export const returnErrorsFetch = (msg, status, id = null) => {
+//   return (dispatch) =>
+//     dispatch(
+//       getErrors({
+//         msg,
+//         status,
+//         id,
+//       }),
+//     );
+// };
+
+// // CLEAR ERRORS
+// export const clearErrorsFetch = () => {
+//   return (dispatch) => {
+//     dispatch(clearErrors());
+//   };
+// };

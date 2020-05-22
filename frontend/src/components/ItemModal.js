@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Button,
   Modal,
@@ -16,7 +16,7 @@ const ItemModal = () => {
   //
   const [name, setName] = useState('');
   const [modal, setModal] = useState(false);
-
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   // methods
@@ -45,14 +45,17 @@ const ItemModal = () => {
 
   return (
     <div>
-      <Button
-        name="btn_main"
-        color="dark"
-        style={{ marginBottom: '2rem' }}
-        onClick={toggle}
-      >
-        Add Item
-      </Button>
+      {isAuthenticated ? (
+        <Button
+          name="btn_main"
+          color="dark"
+          style={{ marginBottom: '2rem' }}
+          onClick={toggle}
+        >
+          Add Item
+        </Button>
+      ) : null}
+
       <Modal name="modal" isOpen={modal} toggle={toggle}>
         <ModalHeader toggle={toggle}>Add To Shopping List</ModalHeader>
         <ModalBody>

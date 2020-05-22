@@ -10,6 +10,7 @@ import { getAllItemsFetch, removeItemFetch } from '../store/fetchActions/index';
 const ShoppingList = () => {
   //const [items, setItems] = useState();
   const { list } = useSelector((state) => state.items);
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => dispatch(getAllItemsFetch()), [dispatch]);
@@ -21,20 +22,25 @@ const ShoppingList = () => {
 
   return (
     <Container>
+      {!isAuthenticated && (
+        <h4 className="text-center mb-4">Please log in to manage items</h4>
+      )}
       <ListGroup>
         <TransitionGroup>
           {list.map(({ _id, name }) => (
             <CSSTransition key={_id} timeout={500} classNames="item">
               <ListGroup>
                 <ListGroupItem key={_id}>
-                  <Button
-                    className="remove-btn"
-                    color="danger"
-                    size="sm"
-                    onClick={() => onHandleRemove(_id)}
-                  >
-                    &times;
-                  </Button>
+                  {isAuthenticated ? (
+                    <Button
+                      className="remove-btn"
+                      color="danger"
+                      size="sm"
+                      onClick={() => onHandleRemove(_id)}
+                    >
+                      &times;
+                    </Button>
+                  ) : null}
 
                   {name}
                 </ListGroupItem>
